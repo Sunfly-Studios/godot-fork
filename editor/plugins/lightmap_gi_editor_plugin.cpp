@@ -66,9 +66,9 @@ void LightmapGIEditorPlugin::_bake_select_file(const String &p_file) {
 
 			if (err == LightmapGI::BAKE_ERROR_OK) {
 				if (get_tree()->get_edited_scene_root() == lightmap) {
-					err = lightmap->bake(lightmap, p_file, bake_func_step);
+					err = lightmap->bake(lightmap, p_file, bake_func_step, nullptr, preview_mode);
 				} else {
-					err = lightmap->bake(lightmap->get_parent(), p_file, bake_func_step);
+					err = lightmap->bake(lightmap->get_parent(), p_file, bake_func_step, nullptr, preview_mode);
 				}
 			}
 		} else {
@@ -123,7 +123,8 @@ void LightmapGIEditorPlugin::_bake_select_file(const String &p_file) {
 	}
 }
 
-void LightmapGIEditorPlugin::_bake() {
+void LightmapGIEditorPlugin::_bake(bool p_preview_mode) {
+	preview_mode = p_preview_mode;
 	_bake_select_file("");
 }
 
@@ -142,8 +143,10 @@ bool LightmapGIEditorPlugin::handles(Object *p_object) const {
 
 void LightmapGIEditorPlugin::make_visible(bool p_visible) {
 	if (p_visible) {
+		bake_preview->show();
 		bake->show();
 	} else {
+		bake_preview->hide();
 		bake->hide();
 	}
 }
@@ -173,36 +176,53 @@ void LightmapGIEditorPlugin::bake_func_end(uint64_t p_time_started) {
 }
 
 void LightmapGIEditorPlugin::_bind_methods() {
-	ClassDB::bind_method("_bake", &LightmapGIEditorPlugin::_bake);
+	ClassDB::bind_method("_bake", &LightmapGIEditorPlugin::_bake, DEFVAL(false));
 }
 
 LightmapGIEditorPlugin::LightmapGIEditorPlugin() {
 	bake = memnew(Button);
 	bake->set_theme_type_variation("FlatButton");
+	
 	// TODO: Rework this as a dedicated toolbar control so we can hook into theme changes and update it
 	// when the editor theme updates.
 	bake->set_button_icon(EditorNode::get_singleton()->get_editor_theme()->get_icon(SNAME("Bake"), EditorStringName(EditorIcons)));
+	bake->set_tooltip_text(TTR("Bakes lightmaps with the settings specified in the LightmapGI node."));
 	bake->set_text(TTR("Bake Lightmaps"));
+	
+	bake_preview = memnew(Button);
+	bake_preview->set_theme_type_variation("FlatButton");
+	bake_preview->set_button_icon(EditorNode::get_singleton()->get_editor_theme()->get_icon(SNAME("BakePreview"), EditorStringName(EditorIcons)));
+	bake_preview->set_tooltip_text(TTR("Bakes lightmaps with low-quality settings for quick iteration.\nPreview bake quality can be changed in the Rendering > Lightmapping > Preview Bake section of the Project Settings."));
+	bake_preview->set_text(TTR("Preview Bake"));
 
 #ifdef MODULE_LIGHTMAPPER_RD_ENABLED
 	// Disable lightmap baking if not supported on the current GPU.
 	if (!DisplayServer::get_singleton()->can_create_rendering_device()) {
 		bake->set_disabled(true);
+		bake_preview->set_disabled(true);
 		bake->set_tooltip_text(vformat(TTR("Lightmap baking is not supported on this GPU (%s)."), RenderingServer::get_singleton()->get_video_adapter_name()));
+		bake_preview->set_tooltip_text(vformat(TTR("Preview Lightmap baking is not supported on this GPU (%s)."), RenderingServer::get_singleton()->get_video_adapter_name()));
 	}
 #else
 	// Disable lightmap baking if the module is disabled at compile-time.
 	bake->set_disabled(true);
+	bake_preview->set_disabled(true);
 #if defined(ANDROID_ENABLED) || defined(IOS_ENABLED)
 	bake->set_tooltip_text(vformat(TTR("Lightmaps cannot be baked on %s."), OS::get_singleton()->get_name()));
+	bake_preview->set_tooltip_text(vformat(TTR("Lightmaps cannot be baked on %s."), OS::get_singleton()->get_name()));
 #else
 	bake->set_tooltip_text(TTR("Lightmaps cannot be baked, as the `lightmapper_rd` module was disabled at compile-time."));
+	bake_preview->set_tooltip_text(TTR("Lightmaps cannot be baked, as the `lightmapper_rd` module was disabled at compile-time."));
 #endif
 #endif // MODULE_LIGHTMAPPER_RD_ENABLED
 
 	bake->hide();
-	bake->connect(SceneStringName(pressed), Callable(this, "_bake"));
+	bake_preview->hide();
+	bake->connect(SceneStringName(pressed), callable_mp(this, &LightmapGIEditorPlugin::_bake).bind(false));
+	bake_preview->connect(SceneStringName(pressed), callable_mp(this, &LightmapGIEditorPlugin::_bake).bind(true));
 	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, bake);
+	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, bake_preview);
+
 	lightmap = nullptr;
 
 	file_dialog = memnew(EditorFileDialog);
