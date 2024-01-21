@@ -270,6 +270,13 @@ Property hints modified to disallow resource types that don't work. The types al
 Decal properties were previously changed from Texture to Texture2D in 4.2, so we need to silence those warnings too.
 
 
+GH-87696
+--------
+Validate extension JSON: Error: Field 'classes/PCKPacker/methods/add_file/arguments': size changed value in new API, from 3 to 4.
+Validate extension JSON: Error: Field 'classes/ProjectSettings/methods/load_resource_pack/arguments': size changed value in new API, from 3 to 4.
+
+Added optional arguments. Compatibility methods registered.
+
 GH-98441
 --------
 Validate extension JSON: Error: Field 'global_enums/KeyModifierMask/values/KEY_MODIFIER_MASK': value changed value in new API, from 5.32677e+08 to 2130706432.
