@@ -89,12 +89,16 @@ const char *Image::format_names[Image::FORMAT_MAX] = {
 
 SavePNGFunc Image::save_png_func = nullptr;
 SaveJPGFunc Image::save_jpg_func = nullptr;
+SaveQOIFunc Image::save_qoi_func = nullptr;
 SaveEXRFunc Image::save_exr_func = nullptr;
 SaveWebPFunc Image::save_webp_func = nullptr;
 
 SavePNGBufferFunc Image::save_png_buffer_func = nullptr;
 SaveJPGBufferFunc Image::save_jpg_buffer_func = nullptr;
 SaveEXRBufferFunc Image::save_exr_buffer_func = nullptr;
+SaveQOIBufferFunc Image::save_qoi_buffer_func = nullptr;
+
+SaveWebPFunc Image::save_webp_func = nullptr;
 SaveWebPBufferFunc Image::save_webp_buffer_func = nullptr;
 
 // External loader function pointers.
@@ -2650,12 +2654,28 @@ Error Image::save_jpg(const String &p_path, float p_quality) const {
 	return save_jpg_func(p_path, Ref<Image>((Image *)this), p_quality);
 }
 
+Error Image::save_qoi(const String &p_path) const {
+	if (save_qoi_func == nullptr) {
+		return ERR_UNAVAILABLE;
+	}
+
+	return save_qoi_func(p_path, Ref<Image>((Image *)this));
+}
+
 Vector<uint8_t> Image::save_png_to_buffer() const {
 	if (save_png_buffer_func == nullptr) {
 		return Vector<uint8_t>();
 	}
 
 	return save_png_buffer_func(Ref<Image>((Image *)this));
+}
+
+Vector<uint8_t> Image::save_qoi_to_buffer() const {
+	if (save_qoi_buffer_func == nullptr) {
+		return Vector<uint8_t>();
+	}
+
+	return save_qoi_buffer_func(Ref<Image>((Image *)this));
 }
 
 Vector<uint8_t> Image::save_jpg_to_buffer(float p_quality) const {
@@ -3170,6 +3190,39 @@ void Image::fill_rect(const Rect2i &p_rect, const Color &p_color) {
 	}
 }
 
+ImageMemLoadFunc Image::_png_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_png_mem_unpacker_func = nullptr;
+ImageMemLoadFunc Image::_jpg_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_webp_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_tga_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_bmp_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_qoi_mem_loader_func = nullptr;
+ScalableImageMemLoadFunc Image::_svg_scalable_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_ktx_mem_loader_func = nullptr;
+
+void (*Image::_image_compress_bc_func)(Image *, Image::UsedChannels) = nullptr;
+void (*Image::_image_compress_bptc_func)(Image *, Image::UsedChannels) = nullptr;
+void (*Image::_image_compress_etc1_func)(Image *) = nullptr;
+void (*Image::_image_compress_etc2_func)(Image *, Image::UsedChannels) = nullptr;
+void (*Image::_image_compress_astc_func)(Image *, Image::ASTCFormat) = nullptr;
+Error (*Image::_image_compress_bptc_rd_func)(Image *, Image::UsedChannels) = nullptr;
+Error (*Image::_image_compress_bc_rd_func)(Image *, Image::UsedChannels) = nullptr;
+void (*Image::_image_decompress_bc)(Image *) = nullptr;
+void (*Image::_image_decompress_bptc)(Image *) = nullptr;
+void (*Image::_image_decompress_etc1)(Image *) = nullptr;
+void (*Image::_image_decompress_etc2)(Image *) = nullptr;
+void (*Image::_image_decompress_astc)(Image *) = nullptr;
+
+Vector<uint8_t> (*Image::webp_lossy_packer)(const Ref<Image> &, float) = nullptr;
+Vector<uint8_t> (*Image::webp_lossless_packer)(const Ref<Image> &) = nullptr;
+Ref<Image> (*Image::webp_unpacker)(const Vector<uint8_t> &) = nullptr;
+Vector<uint8_t> (*Image::png_packer)(const Ref<Image> &) = nullptr;
+Ref<Image> (*Image::png_unpacker)(const Vector<uint8_t> &) = nullptr;
+Vector<uint8_t> (*Image::basis_universal_packer)(const Ref<Image> &, Image::UsedChannels) = nullptr;
+Ref<Image> (*Image::basis_universal_unpacker)(const Vector<uint8_t> &) = nullptr;
+Ref<Image> (*Image::basis_universal_unpacker_ptr)(const uint8_t *, int) = nullptr;
+
+>>>>>>> bfa5e7d7c9 (QOI Image Support)
 void Image::_set_data(const Dictionary &p_data) {
 	ERR_FAIL_COND(!p_data.has("width"));
 	ERR_FAIL_COND(!p_data.has("height"));
@@ -3592,6 +3645,8 @@ void Image::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("save_png_to_buffer"), &Image::save_png_to_buffer);
 	ClassDB::bind_method(D_METHOD("save_jpg", "path", "quality"), &Image::save_jpg, DEFVAL(0.75));
 	ClassDB::bind_method(D_METHOD("save_jpg_to_buffer", "quality"), &Image::save_jpg_to_buffer, DEFVAL(0.75));
+	ClassDB::bind_method(D_METHOD("save_qoi", "path"), &Image::save_qoi);
+	ClassDB::bind_method(D_METHOD("save_qoi_to_buffer"), &Image::save_qoi_to_buffer);
 	ClassDB::bind_method(D_METHOD("save_exr", "path", "grayscale"), &Image::save_exr, DEFVAL(false));
 	ClassDB::bind_method(D_METHOD("save_exr_to_buffer", "grayscale"), &Image::save_exr_to_buffer, DEFVAL(false));
 	ClassDB::bind_method(D_METHOD("save_webp", "path", "lossy", "quality"), &Image::save_webp, DEFVAL(false), DEFVAL(0.75f));
@@ -3646,6 +3701,7 @@ void Image::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("load_webp_from_buffer", "buffer"), &Image::load_webp_from_buffer);
 	ClassDB::bind_method(D_METHOD("load_tga_from_buffer", "buffer"), &Image::load_tga_from_buffer);
 	ClassDB::bind_method(D_METHOD("load_bmp_from_buffer", "buffer"), &Image::load_bmp_from_buffer);
+	ClassDB::bind_method(D_METHOD("load_qoi_from_buffer", "buffer"), &Image::load_qoi_from_buffer);
 	ClassDB::bind_method(D_METHOD("load_ktx_from_buffer", "buffer"), &Image::load_ktx_from_buffer);
 
 	ClassDB::bind_method(D_METHOD("load_svg_from_buffer", "buffer", "scale"), &Image::load_svg_from_buffer, DEFVAL(1.0));
@@ -4057,6 +4113,14 @@ Error Image::load_bmp_from_buffer(const Vector<uint8_t> &p_array) {
 			ERR_UNAVAILABLE,
 			"The BMP module isn't enabled. Recompile the Godot editor or export template binary with the `module_bmp_enabled=yes` SCons option.");
 	return _load_from_buffer(p_array, _bmp_mem_loader_func);
+}
+
+Error Image::load_qoi_from_buffer(const Vector<uint8_t> &p_array) {
+	ERR_FAIL_NULL_V_MSG(
+			_qoi_mem_loader_func,
+			ERR_UNAVAILABLE,
+			"The QOI module isn't enabled. Recompile the Godot editor or export template binary with the `module_qoi_enabled=yes` SCons option.");
+	return _load_from_buffer(p_array, _qoi_mem_loader_func);
 }
 
 Error Image::load_svg_from_buffer(const Vector<uint8_t> &p_array, float scale) {
