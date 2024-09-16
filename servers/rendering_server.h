@@ -1205,6 +1205,7 @@ public:
 		ENV_TONE_MAPPER_HABLE,
 		ENV_TONE_MAPPER_CINEON,
 		ENV_TONE_MAPPER_DRAGO,
+		ENV_TONE_MAPPER_TONY_MC_MAPFACE,
 	};
 
 	virtual void environment_set_tonemap(RID p_env, EnvironmentToneMapper p_tone_mapper, float p_exposure, float p_white) = 0;
