@@ -114,6 +114,12 @@ GH-91201
 --------
 Validate extension JSON: JSON file: Field was added in a way that breaks compatibility 'classes/OS/methods/read_string_from_stdin': arguments
 
+
+GH-87696
+--------
+Validate extension JSON: Error: Field 'classes/PCKPacker/methods/add_file/arguments': size changed value in new API, from 3 to 4.
+
+
 Added optional argument. Compatibility method registered.
 
 
