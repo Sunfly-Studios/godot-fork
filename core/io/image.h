@@ -65,16 +65,6 @@ class Image : public Resource {
 	GDCLASS(Image, Resource);
 
 public:
-	static SavePNGFunc save_png_func;
-	static SaveQOIFunc save_qoi_func;
-	static SaveJPGFunc save_jpg_func;
-	static SaveEXRFunc save_exr_func;
-	static SavePNGBufferFunc save_png_buffer_func;
-	static SaveEXRBufferFunc save_exr_buffer_func;
-	static SaveJPGBufferFunc save_jpg_buffer_func;
-	static SaveQOIBufferFunc save_qoi_buffer_func;
-	static SaveWebPFunc save_webp_func;
-	static SaveWebPBufferFunc save_webp_buffer_func;
 
 	enum {
 		MAX_WIDTH = (1 << 24), // Force a limit somehow.
@@ -196,12 +186,14 @@ public:
 	// External saver function pointers.
 
 	static SavePNGFunc save_png_func;
+	static SaveQOIFunc save_qoi_func;
 	static SaveJPGFunc save_jpg_func;
 	static SaveEXRFunc save_exr_func;
-	static SaveWebPFunc save_webp_func;
 	static SavePNGBufferFunc save_png_buffer_func;
 	static SaveEXRBufferFunc save_exr_buffer_func;
 	static SaveJPGBufferFunc save_jpg_buffer_func;
+	static SaveQOIBufferFunc save_qoi_buffer_func;
+	static SaveWebPFunc save_webp_func;
 	static SaveWebPBufferFunc save_webp_buffer_func;
 
 	// External loader function pointers.
