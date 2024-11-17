@@ -360,7 +360,7 @@ bool PackedSourcePCK::try_open_pack(const String &p_path, bool p_replace_files, 
 		ERR_FAIL_COND_V_MSG(err, false, "Can't open encrypted pack directory.");
 		f = fae;
 	}
-	
+
 	for (int i = 0; i < file_count; i++) {
 		uint32_t sl = f->get_32();
 		CharString cs;

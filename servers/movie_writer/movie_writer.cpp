@@ -180,7 +180,7 @@ void MovieWriter::add_frame() {
 			String::num(movie_time_seconds / 3600).pad_zeros(2),
 			String::num((movie_time_seconds % 3600) / 60).pad_zeros(2),
 			String::num(movie_time_seconds % 60).pad_zeros(2));
-            
+
 	const int real_time_seconds = Time::get_singleton()->get_ticks_msec() / 1000;
 	const String real_time = vformat("%s:%s:%s",
 			String::num(real_time_seconds / 3600).pad_zeros(2),
@@ -190,26 +190,22 @@ void MovieWriter::add_frame() {
 	const int frame_to_save = Engine::get_singleton()->get_frames_drawn() / (1 + Engine::get_singleton()->get_write_movie_subframes());
 #ifdef DEBUG_ENABLED
 	DisplayServer::get_singleton()->window_set_title(
-        vformat(
-            "MovieWriter: Frame %d (time: %s) - %s (frames saved: %s) | real time: %s (DEBUG)",
-            Engine::get_singleton()->get_frames_drawn(),
-            movie_time,
-            project_name,
-			frame_to_save,
-            real_time
-        )
-    );
+			vformat(
+					"MovieWriter: Frame %d (time: %s) - %s (frames saved: %s) | real time: %s (DEBUG)",
+					Engine::get_singleton()->get_frames_drawn(),
+					movie_time,
+					project_name,
+					frame_to_save,
+					real_time));
 #else
 	DisplayServer::get_singleton()->window_set_title(
-        vformat(
-            "MovieWriter: Frame %d (time: %s) - %s (frames saved: %s) | real time: %s",
-            Engine::get_singleton()->get_frames_drawn(),
-            movie_time,
-            project_name,
-			frame_to_save,
-            real_time
-        )
-    );
+			vformat(
+					"MovieWriter: Frame %d (time: %s) - %s (frames saved: %s) | real time: %s",
+					Engine::get_singleton()->get_frames_drawn(),
+					movie_time,
+					project_name,
+					frame_to_save,
+					real_time));
 #endif
 
 	RID main_vp_rid = RenderingServer::get_singleton()->viewport_find_from_screen_attachment(DisplayServer::MAIN_WINDOW_ID);

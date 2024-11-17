@@ -3,9 +3,9 @@ from misc.utility.scons_hints import *
 
 Import("env")
 
+import base64
 import os
 
-import base64
 import core_builders
 
 import methods
@@ -228,6 +228,7 @@ extern uint8_t pck_sign_pub_key[{source[0]}];
 size_t pck_sign_pub_key_len={source[0]};"""
         )
 
+
 def encryption_key_cpp_builder(target, source, env):
     with methods.generated_wrapper(target) as file:
         file.write(
@@ -241,6 +242,7 @@ uint8_t pck_sign_pub_key[{source[1]}] = {{
     {source[2]}
 }};"""
         )
+
 
 gdkey = "0" * 64
 ec_valid = True
@@ -286,7 +288,11 @@ env.Depends(
     "#core/script_encryption_key.gen.cpp",
     [env.Value(gdkey), env.Value(pubkey_len), env.Value(pubkey)],
 )
-gen_encrypt_cpp = env.CommandNoCache("#core/script_encryption_key.gen.cpp", [env.Value(gdkey), env.Value(pubkey_len), env.Value(pubkey)], env.Run(encryption_key_cpp_builder))
+gen_encrypt_cpp = env.CommandNoCache(
+    "#core/script_encryption_key.gen.cpp",
+    [env.Value(gdkey), env.Value(pubkey_len), env.Value(pubkey)],
+    env.Run(encryption_key_cpp_builder),
+)
 env.add_source_files(env.core_sources, gen_encrypt_cpp)
 
 if env["module_mbedtls_enabled"] or env.editor_build or "PCK_SIGNING_PUBLIC_KEY" in os.environ:

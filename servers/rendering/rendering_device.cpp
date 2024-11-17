@@ -4537,7 +4537,7 @@ void RenderingDevice::draw_list_draw_indirect(DrawListID p_list, bool p_use_indi
 			dl->state.sets[i].bound = true;
 		}
 	}
-	
+
 	if (p_use_indices) {
 #ifdef DEBUG_ENABLED
 		ERR_FAIL_COND_MSG(!dl->validation.index_array_count,
@@ -4566,104 +4566,104 @@ void RenderingDevice::draw_list_draw_indirect(DrawListID p_list, bool p_use_indi
 }
 
 void RenderingDevice::draw_list_dispatch_mesh(DrawListID p_list, bool p_use_indices, uint32_t p_instances, uint32_t p_procedural_vertices) {
-    ERR_RENDER_THREAD_GUARD();
+	ERR_RENDER_THREAD_GUARD();
 
-    DrawList *dl = _get_draw_list_ptr(p_list);
-    ERR_FAIL_NULL(dl);
+	DrawList *dl = _get_draw_list_ptr(p_list);
+	ERR_FAIL_NULL(dl);
 #ifdef DEBUG_ENABLED
 	ERR_FAIL_COND_MSG(!has_feature(SUPPORTS_MESH_SHADER),
-			"The GPU doesn't support Mesh Shaders, its your reponsibility to check it does before calling this.");
-    ERR_FAIL_COND_MSG(!dl->validation.active, "Submitted Draw Lists can no longer be modified.");
+			"The GPU doesn't support Mesh Shaders, its your responsibility to check it does before calling this.");
+	ERR_FAIL_COND_MSG(!dl->validation.active, "Submitted Draw Lists can no longer be modified.");
 #endif
 
 #ifdef DEBUG_ENABLED
-    ERR_FAIL_COND_MSG(!dl->validation.pipeline_active,
-            "No render pipeline was set before attempting to draw.");
+	ERR_FAIL_COND_MSG(!dl->validation.pipeline_active,
+			"No render pipeline was set before attempting to draw.");
 
-    ERR_FAIL_COND_MSG(p_use_indices && p_procedural_vertices > 0,
-            "Procedural vertices can't be used together with indices.");
+	ERR_FAIL_COND_MSG(p_use_indices && p_procedural_vertices > 0,
+			"Procedural vertices can't be used together with indices.");
 
-    const Shader *shader = shader_owner.get_or_null(dl->validation.pipeline_shader);
-    ERR_FAIL_NULL(shader);
-    
-    // Validate shader stage and mesh shader capabilities
-    if (shader->stage_bits.has_flag(RDD::PIPELINE_STAGE_MESH_TASK_SHADER_BIT)) {
-        ERR_FAIL_COND_MSG(p_instances == 0, "Instance count for mesh task shader cannot be zero.");
-        ERR_FAIL_COND_MSG(p_instances > driver->limit_get(LIMIT_MAX_MESH_TASK_WORKGROUP_COUNT_X),
-                "Instance count (" + itos(p_instances) + ") is larger than device mesh task workgroup limit (" + 
-                itos(driver->limit_get(LIMIT_MAX_MESH_TASK_WORKGROUP_COUNT_X)) + ")");
-    } else if (shader->stage_bits.has_flag(RDD::PIPELINE_STAGE_MESH_SHADER_BIT)) {
-        ERR_FAIL_COND_MSG(p_instances == 0, "Instance count for mesh shader cannot be zero.");
-        ERR_FAIL_COND_MSG(p_instances > driver->limit_get(LIMIT_MAX_MESH_WORKGROUP_COUNT_X),
-                "Instance count (" + itos(p_instances) + ") is larger than device mesh workgroup limit (" + 
-                itos(driver->limit_get(LIMIT_MAX_MESH_WORKGROUP_COUNT_X)) + ")");
-    } else {
-        ERR_FAIL_MSG("Unexpected pipeline stage - mesh or task shader stage required.");
-    }
+	const Shader *shader = shader_owner.get_or_null(dl->validation.pipeline_shader);
+	ERR_FAIL_NULL(shader);
 
-    if (p_use_indices) {
-        ERR_FAIL_COND_MSG(!dl->validation.index_array_count,
-                "Draw command requested indices, but no index buffer was set.");
-    }
+	// Validate shader stage and mesh shader capabilities
+	if (shader->stage_bits.has_flag(RDD::PIPELINE_STAGE_MESH_TASK_SHADER_BIT)) {
+		ERR_FAIL_COND_MSG(p_instances == 0, "Instance count for mesh task shader cannot be zero.");
+		ERR_FAIL_COND_MSG(p_instances > driver->limit_get(LIMIT_MAX_MESH_TASK_WORKGROUP_COUNT_X),
+				"Instance count (" + itos(p_instances) + ") is larger than device mesh task workgroup limit (" +
+						itos(driver->limit_get(LIMIT_MAX_MESH_TASK_WORKGROUP_COUNT_X)) + ")");
+	} else if (shader->stage_bits.has_flag(RDD::PIPELINE_STAGE_MESH_SHADER_BIT)) {
+		ERR_FAIL_COND_MSG(p_instances == 0, "Instance count for mesh shader cannot be zero.");
+		ERR_FAIL_COND_MSG(p_instances > driver->limit_get(LIMIT_MAX_MESH_WORKGROUP_COUNT_X),
+				"Instance count (" + itos(p_instances) + ") is larger than device mesh workgroup limit (" +
+						itos(driver->limit_get(LIMIT_MAX_MESH_WORKGROUP_COUNT_X)) + ")");
+	} else {
+		ERR_FAIL_MSG("Unexpected pipeline stage - mesh or task shader stage required.");
+	}
 
-    if (dl->validation.pipeline_push_constant_size > 0) {
-        ERR_FAIL_COND_MSG(!dl->validation.pipeline_push_constant_supplied,
-                "The shader in this pipeline requires a push constant to be set before drawing, but it's not present.");
-    }
+	if (p_use_indices) {
+		ERR_FAIL_COND_MSG(!dl->validation.index_array_count,
+				"Draw command requested indices, but no index buffer was set.");
+	}
+
+	if (dl->validation.pipeline_push_constant_size > 0) {
+		ERR_FAIL_COND_MSG(!dl->validation.pipeline_push_constant_supplied,
+				"The shader in this pipeline requires a push constant to be set before drawing, but it's not present.");
+	}
 #endif
 
 #ifdef DEBUG_ENABLED
-    for (uint32_t i = 0; i < dl->state.set_count; i++) {
-        if (dl->state.sets[i].pipeline_expected_format == 0) {
-            // Nothing expected by this pipeline.
-            continue;
-        }
+	for (uint32_t i = 0; i < dl->state.set_count; i++) {
+		if (dl->state.sets[i].pipeline_expected_format == 0) {
+			// Nothing expected by this pipeline.
+			continue;
+		}
 
-        if (dl->state.sets[i].pipeline_expected_format != dl->state.sets[i].uniform_set_format) {
-            if (dl->state.sets[i].uniform_set_format == 0) {
-                ERR_FAIL_MSG("Uniforms were never supplied for set (" + itos(i) + ") at the time of drawing, which are required by the pipeline.");
-            } else if (uniform_set_owner.owns(dl->state.sets[i].uniform_set)) {
-                UniformSet *us = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
-                ERR_FAIL_MSG("Uniforms supplied for set (" + itos(i) + "):\n" + _shader_uniform_debug(us->shader_id, us->shader_set) + 
-                        "\nare not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n" + 
-                        _shader_uniform_debug(dl->state.pipeline_shader));
-            } else {
-                ERR_FAIL_MSG("Uniforms supplied for set (" + itos(i) + ", which was just freed) are not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n" + 
-                        _shader_uniform_debug(dl->state.pipeline_shader));
-            }
-        }
-    }
+		if (dl->state.sets[i].pipeline_expected_format != dl->state.sets[i].uniform_set_format) {
+			if (dl->state.sets[i].uniform_set_format == 0) {
+				ERR_FAIL_MSG("Uniforms were never supplied for set (" + itos(i) + ") at the time of drawing, which are required by the pipeline.");
+			} else if (uniform_set_owner.owns(dl->state.sets[i].uniform_set)) {
+				UniformSet *us = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
+				ERR_FAIL_MSG("Uniforms supplied for set (" + itos(i) + "):\n" + _shader_uniform_debug(us->shader_id, us->shader_set) +
+						"\nare not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n" +
+						_shader_uniform_debug(dl->state.pipeline_shader));
+			} else {
+				ERR_FAIL_MSG("Uniforms supplied for set (" + itos(i) + ", which was just freed) are not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n" +
+						_shader_uniform_debug(dl->state.pipeline_shader));
+			}
+		}
+	}
 #endif
 
-    // Prepare descriptor sets if the API doesn't use pipeline barriers
-    if (!driver->api_trait_get(RDD::API_TRAIT_HONORS_PIPELINE_BARRIERS)) {
-        for (uint32_t i = 0; i < dl->state.set_count; i++) {
-            if (dl->state.sets[i].pipeline_expected_format == 0) {
-                continue;
-            }
+	// Prepare descriptor sets if the API doesn't use pipeline barriers
+	if (!driver->api_trait_get(RDD::API_TRAIT_HONORS_PIPELINE_BARRIERS)) {
+		for (uint32_t i = 0; i < dl->state.set_count; i++) {
+			if (dl->state.sets[i].pipeline_expected_format == 0) {
+				continue;
+			}
 
-            draw_graph.add_draw_list_uniform_set_prepare_for_use(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
-        }
-    }
+			draw_graph.add_draw_list_uniform_set_prepare_for_use(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
+		}
+	}
 
-    // Bind descriptor sets
-    for (uint32_t i = 0; i < dl->state.set_count; i++) {
-        if (dl->state.sets[i].pipeline_expected_format == 0) {
-            continue;
-        }
-        if (!dl->state.sets[i].bound) {
-            draw_graph.add_draw_list_bind_uniform_set(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
+	// Bind descriptor sets
+	for (uint32_t i = 0; i < dl->state.set_count; i++) {
+		if (dl->state.sets[i].pipeline_expected_format == 0) {
+			continue;
+		}
+		if (!dl->state.sets[i].bound) {
+			draw_graph.add_draw_list_bind_uniform_set(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
 
-            UniformSet *uniform_set = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
-            _uniform_set_update_shared(uniform_set);
+			UniformSet *uniform_set = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
+			_uniform_set_update_shared(uniform_set);
 
-            draw_graph.add_draw_list_usages(uniform_set->draw_trackers, uniform_set->draw_trackers_usage);
+			draw_graph.add_draw_list_usages(uniform_set->draw_trackers, uniform_set->draw_trackers_usage);
 
-            dl->state.sets[i].bound = true;
-        }
-    }
+			dl->state.sets[i].bound = true;
+		}
+	}
 
-    if (p_use_indices) {
+	if (p_use_indices) {
 #ifdef DEBUG_ENABLED
 		ERR_FAIL_COND_MSG(p_procedural_vertices > 0,
 				"Procedural vertices can't be used together with indices.");
@@ -4674,7 +4674,7 @@ void RenderingDevice::draw_list_dispatch_mesh(DrawListID p_list, bool p_use_indi
 		ERR_FAIL_COND_MSG(dl->validation.pipeline_uses_restart_indices != dl->validation.index_buffer_uses_restart_indices,
 				"The usage of restart indices in index buffer does not match the render primitive in the pipeline.");
 #endif
-        uint32_t to_draw = dl->validation.index_array_count;
+		uint32_t to_draw = dl->validation.index_array_count;
 #ifdef DEBUG_ENABLED
 		ERR_FAIL_COND_MSG(to_draw < dl->validation.pipeline_primitive_minimum,
 				"Too few indices (" + itos(to_draw) + ") for the render primitive set in the render pipeline (" + itos(dl->validation.pipeline_primitive_minimum) + ").");
@@ -4682,88 +4682,88 @@ void RenderingDevice::draw_list_dispatch_mesh(DrawListID p_list, bool p_use_indi
 		ERR_FAIL_COND_MSG((to_draw % dl->validation.pipeline_primitive_divisor) != 0,
 				"Index amount (" + itos(to_draw) + ") must be a multiple of the amount of indices required by the render primitive (" + itos(dl->validation.pipeline_primitive_divisor) + ").");
 #endif
-        draw_graph.add_draw_list_dispatch_mesh_indexed(to_draw, p_instances, 0);
-    } else if (p_procedural_vertices > 0) {
-        draw_graph.add_draw_list_dispatch_mesh(p_procedural_vertices, p_instances);
-    } else {
-        uint32_t to_draw = dl->validation.vertex_array_size;
-        draw_graph.add_draw_list_dispatch_mesh(to_draw, p_instances);
-    }
+		draw_graph.add_draw_list_dispatch_mesh_indexed(to_draw, p_instances, 0);
+	} else if (p_procedural_vertices > 0) {
+		draw_graph.add_draw_list_dispatch_mesh(p_procedural_vertices, p_instances);
+	} else {
+		uint32_t to_draw = dl->validation.vertex_array_size;
+		draw_graph.add_draw_list_dispatch_mesh(to_draw, p_instances);
+	}
 
-    dl->state.draw_count++;
+	dl->state.draw_count++;
 }
 
 void RenderingDevice::draw_list_dispatch_mesh_indirect(DrawListID p_list, bool p_use_indices, RID p_buffer, uint32_t p_offset, uint32_t p_draw_count, uint32_t p_stride) {
-    ERR_RENDER_THREAD_GUARD();
+	ERR_RENDER_THREAD_GUARD();
 
-    DrawList *dl = _get_draw_list_ptr(p_list);
-    ERR_FAIL_NULL(dl);
+	DrawList *dl = _get_draw_list_ptr(p_list);
+	ERR_FAIL_NULL(dl);
 
-    Buffer *buffer = storage_buffer_owner.get_or_null(p_buffer);
-    ERR_FAIL_NULL(buffer);
+	Buffer *buffer = storage_buffer_owner.get_or_null(p_buffer);
+	ERR_FAIL_NULL(buffer);
 
-    ERR_FAIL_COND_MSG(!buffer->usage.has_flag(RDD::BUFFER_USAGE_INDIRECT_BIT), "Buffer provided was not created to do indirect dispatch.");
+	ERR_FAIL_COND_MSG(!buffer->usage.has_flag(RDD::BUFFER_USAGE_INDIRECT_BIT), "Buffer provided was not created to do indirect dispatch.");
 
 #ifdef DEBUG_ENABLED
-    ERR_FAIL_COND_MSG(!has_feature(SUPPORTS_MESH_SHADER),
-            "The GPU doesn't support Mesh Shaders, its your responsibility to check it does before calling this.");
+	ERR_FAIL_COND_MSG(!has_feature(SUPPORTS_MESH_SHADER),
+			"The GPU doesn't support Mesh Shaders, its your responsibility to check it does before calling this.");
 #endif
 
 #ifdef DEBUG_ENABLED
-    ERR_FAIL_COND_MSG(!dl->validation.pipeline_active,
-            "No render pipeline was set before attempting to draw.");
+	ERR_FAIL_COND_MSG(!dl->validation.pipeline_active,
+			"No render pipeline was set before attempting to draw.");
 
-    if (dl->validation.pipeline_push_constant_size > 0) {
-        // Using push constants, check that they were supplied.
-        ERR_FAIL_COND_MSG(!dl->validation.pipeline_push_constant_supplied,
-                "The shader in this pipeline requires a push constant to be set before drawing, but it's not present.");
-    }
+	if (dl->validation.pipeline_push_constant_size > 0) {
+		// Using push constants, check that they were supplied.
+		ERR_FAIL_COND_MSG(!dl->validation.pipeline_push_constant_supplied,
+				"The shader in this pipeline requires a push constant to be set before drawing, but it's not present.");
+	}
 #endif
 
-    ERR_FAIL_COND_MSG(p_offset + 12 > buffer->size, "Offset provided (+12) is past the end of buffer.");
+	ERR_FAIL_COND_MSG(p_offset + 12 > buffer->size, "Offset provided (+12) is past the end of buffer.");
 
-    // Prepare descriptor sets if the API doesn't use pipeline barriers.
-    if (!driver->api_trait_get(RDD::API_TRAIT_HONORS_PIPELINE_BARRIERS)) {
-        for (uint32_t i = 0; i < dl->state.set_count; i++) {
-            if (dl->state.sets[i].pipeline_expected_format == 0) {
-                // Nothing expected by this pipeline.
-                continue;
-            }
+	// Prepare descriptor sets if the API doesn't use pipeline barriers.
+	if (!driver->api_trait_get(RDD::API_TRAIT_HONORS_PIPELINE_BARRIERS)) {
+		for (uint32_t i = 0; i < dl->state.set_count; i++) {
+			if (dl->state.sets[i].pipeline_expected_format == 0) {
+				// Nothing expected by this pipeline.
+				continue;
+			}
 
-            draw_graph.add_draw_list_uniform_set_prepare_for_use(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
-        }
-    }
+			draw_graph.add_draw_list_uniform_set_prepare_for_use(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
+		}
+	}
 
-    // Bind descriptor sets.
-    for (uint32_t i = 0; i < dl->state.set_count; i++) {
-        if (dl->state.sets[i].pipeline_expected_format == 0) {
-            continue; // Nothing expected by this pipeline.
-        }
+	// Bind descriptor sets.
+	for (uint32_t i = 0; i < dl->state.set_count; i++) {
+		if (dl->state.sets[i].pipeline_expected_format == 0) {
+			continue; // Nothing expected by this pipeline.
+		}
 #ifdef DEBUG_ENABLED
-        if (dl->state.sets[i].pipeline_expected_format != dl->state.sets[i].uniform_set_format) {
-            if (dl->state.sets[i].uniform_set_format == 0) {
-                ERR_FAIL_MSG(vformat("Uniforms were never supplied for set (%d) at the time of drawing, which are required by the pipeline.", i));
-            } else if (uniform_set_owner.owns(dl->state.sets[i].uniform_set)) {
-                UniformSet *us = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
-                ERR_FAIL_MSG(vformat("Uniforms supplied for set (%d):\n%s\nare not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n%s", i, _shader_uniform_debug(us->shader_id, us->shader_set), _shader_uniform_debug(dl->state.pipeline_shader)));
-            } else {
-                ERR_FAIL_MSG(vformat("Uniforms supplied for set (%s, which was just freed) are not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n%s", i, _shader_uniform_debug(dl->state.pipeline_shader)));
-            }
-        }
+		if (dl->state.sets[i].pipeline_expected_format != dl->state.sets[i].uniform_set_format) {
+			if (dl->state.sets[i].uniform_set_format == 0) {
+				ERR_FAIL_MSG(vformat("Uniforms were never supplied for set (%d) at the time of drawing, which are required by the pipeline.", i));
+			} else if (uniform_set_owner.owns(dl->state.sets[i].uniform_set)) {
+				UniformSet *us = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
+				ERR_FAIL_MSG(vformat("Uniforms supplied for set (%d):\n%s\nare not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n%s", i, _shader_uniform_debug(us->shader_id, us->shader_set), _shader_uniform_debug(dl->state.pipeline_shader)));
+			} else {
+				ERR_FAIL_MSG(vformat("Uniforms supplied for set (%s, which was just freed) are not the same format as required by the pipeline shader. Pipeline shader requires the following bindings:\n%s", i, _shader_uniform_debug(dl->state.pipeline_shader)));
+			}
+		}
 #endif
-        if (!dl->state.sets[i].bound) {
-            // All good, see if this requires re-binding.
-            draw_graph.add_draw_list_bind_uniform_set(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
+		if (!dl->state.sets[i].bound) {
+			// All good, see if this requires re-binding.
+			draw_graph.add_draw_list_bind_uniform_set(dl->state.pipeline_shader_driver_id, dl->state.sets[i].uniform_set_driver_id, i);
 
-            UniformSet *uniform_set = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
-            _uniform_set_update_shared(uniform_set);
+			UniformSet *uniform_set = uniform_set_owner.get_or_null(dl->state.sets[i].uniform_set);
+			_uniform_set_update_shared(uniform_set);
 
-            draw_graph.add_draw_list_usages(uniform_set->draw_trackers, uniform_set->draw_trackers_usage);
+			draw_graph.add_draw_list_usages(uniform_set->draw_trackers, uniform_set->draw_trackers_usage);
 
-            dl->state.sets[i].bound = true;
-        }
-    }
-    
+			dl->state.sets[i].bound = true;
+		}
+	}
+
 	if (p_use_indices) {
 #ifdef DEBUG_ENABLED
 		ERR_FAIL_COND_MSG(!dl->validation.index_array_count,
@@ -4780,13 +4780,13 @@ void RenderingDevice::draw_list_dispatch_mesh_indirect(DrawListID p_list, bool p
 		ERR_FAIL_COND_MSG(p_offset + 16 > buffer->size, "Offset provided (+16) is past the end of buffer.");
 		draw_graph.add_draw_list_dispatch_mesh_indirect(buffer->driver_id, p_offset, p_draw_count, p_stride);
 	}
-    dl->state.draw_count++;
+	dl->state.draw_count++;
 
-    if (buffer->draw_tracker != nullptr) {
-        draw_graph.add_draw_list_usage(buffer->draw_tracker, RDG::RESOURCE_USAGE_INDIRECT_BUFFER_READ);
-    }
+	if (buffer->draw_tracker != nullptr) {
+		draw_graph.add_draw_list_usage(buffer->draw_tracker, RDG::RESOURCE_USAGE_INDIRECT_BUFFER_READ);
+	}
 
-    _check_transfer_worker_buffer(buffer);
+	_check_transfer_worker_buffer(buffer);
 }
 
 void RenderingDevice::draw_list_enable_scissor(DrawListID p_list, const Rect2 &p_rect) {

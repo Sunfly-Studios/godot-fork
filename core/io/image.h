@@ -65,7 +65,6 @@ class Image : public Resource {
 	GDCLASS(Image, Resource);
 
 public:
-
 	enum {
 		MAX_WIDTH = (1 << 24), // Force a limit somehow.
 		MAX_HEIGHT = (1 << 24), // Force a limit somehow.

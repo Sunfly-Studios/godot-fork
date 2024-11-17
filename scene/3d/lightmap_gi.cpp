@@ -1241,13 +1241,13 @@ LightmapGI::BakeError LightmapGI::bake(Node *p_from_node, String p_image_data_pa
 			exposure_normalization = camera_attributes->calculate_exposure_normalization();
 		}
 	}
-    
+
 	Lightmapper::BakeError bake_err;
 	bake_err = lightmapper->bake(
 			Lightmapper::BakeQuality(effective_bake_quality),
 			use_denoiser,
 			denoiser_strength,
-            denoiser_range,
+			denoiser_range,
 			effective_bounces,
 			bounce_indirect_energy,
 			bias,

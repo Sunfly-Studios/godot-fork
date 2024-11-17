@@ -10,5 +10,5 @@ env.add_source_files(env.servers_sources, "*.cpp")
 env.CommandNoCache(
     "tony_mc_mapface_lut.gen.h",
     ["make_tony_mc_mapface_lut.py", "#thirdparty/tony-mc-mapface/tony_mc_mapface.dds"],
-    env.Run(make_tony_mc_mapface_lut.run)
+    env.Run(make_tony_mc_mapface_lut.run),
 )

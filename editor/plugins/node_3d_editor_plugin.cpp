@@ -8016,8 +8016,8 @@ void Node3DEditor::_update_theme() {
 	view_menu->get_popup()->set_item_icon(view_menu->get_popup()->get_item_index(MENU_VIEW_USE_3_VIEWPORTS_ALT), get_editor_theme_icon(SNAME("Panels3Alt")));
 	view_menu->get_popup()->set_item_icon(view_menu->get_popup()->get_item_index(MENU_VIEW_USE_4_VIEWPORTS), get_editor_theme_icon(SNAME("Panels4")));
 
-	// I prefer the coloured Sun and Environment
-	// icons than the more-consistent grey ones.
+	// I prefer the colored Sun and Environment
+	// icons than the more-consistent gray ones.
 	sun_button->set_button_icon(get_editor_theme_icon(SNAME("DirectionalLight3D")));
 	environ_button->set_button_icon(get_editor_theme_icon(SNAME("WorldEnvironment")));
 	sun_environ_settings->set_button_icon(get_editor_theme_icon(SNAME("GuiTabMenuHl")));

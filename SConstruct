@@ -212,7 +212,13 @@ opts.Add(EnumVariable("lto", "Link-time optimization (production builds)", "none
 opts.Add(BoolVariable("production", "Set defaults to build Godot for use in production", False))
 opts.Add(BoolVariable("threads", "Enable threading support", True))
 
-opts.Add(BoolVariable("old_input_header", "Use the <linux/input.h> instead of <linux/input-event-codes.h> header (useful in older linux kernels)", False))
+opts.Add(
+    BoolVariable(
+        "old_input_header",
+        "Use the <linux/input.h> instead of <linux/input-event-codes.h> header (useful in older linux kernels)",
+        False,
+    )
+)
 opts.Add(BoolVariable("atomic_assert", "Enables `std::atomic<T>::is_always_lock_free` assertions.", True))
 
 # Components
@@ -260,7 +266,11 @@ opts.Add("vsproj_name", "Name of the Visual Studio solution", "godot")
 opts.Add("import_env_vars", "A comma-separated list of environment variables to copy from the outer environment.", "")
 opts.Add(BoolVariable("disable_3d", "Disable 3D nodes for a smaller executable", False))
 opts.Add(BoolVariable("disable_advanced_gui", "Disable advanced GUI nodes and behaviors", False))
-opts.Add(BoolVariable("disable_tony_mc_mapface", "Disable Tony McMapface tonemapping mode (decreases binary size by 306 KB)", False))
+opts.Add(
+    BoolVariable(
+        "disable_tony_mc_mapface", "Disable Tony McMapface tonemapping mode (decreases binary size by 306 KB)", False
+    )
+)
 opts.Add("build_profile", "Path to a file containing a feature build profile", "")
 opts.Add(BoolVariable("modules_enabled_by_default", "If no, disable all modules except ones explicitly enabled", True))
 opts.Add(BoolVariable("no_editor_splash", "Don't use the custom splash screen for the editor", True))
@@ -358,7 +368,9 @@ if env["platform"] == "":
 if env["platform"] in compatibility_platform_aliases:
     alias = env["platform"]
     platform = compatibility_platform_aliases[alias]
-    print_warning(f'Platform "{alias}" has been renamed to "{platform}" in Godot 4. Building for platform "{platform}".')
+    print_warning(
+        f'Platform "{alias}" has been renamed to "{platform}" in Godot 4. Building for platform "{platform}".'
+    )
     env["platform"] = platform
 
 # Alias for convenience.
@@ -625,7 +637,7 @@ if env["scu_build"]:
     methods.set_scu_folders(scu_builders.generate_scu_files(max_includes_per_scu))
 
 if not env["atomic_assert"]:
-    print("WARNING: atomic assertions are disabled, your Godot games might run slower.");
+    print("WARNING: atomic assertions are disabled, your Godot games might run slower.")
     env.Append(CPPDEFINES=["ATOMIC_ASSERT"])
 
 # Must happen after the flags' definition, as configure is when most flags

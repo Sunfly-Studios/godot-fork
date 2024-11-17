@@ -490,7 +490,7 @@ private:
 		uint32_t draw_count = 0;
 		uint32_t stride = 0;
 	};
-	
+
 	struct DrawListDispatchMeshInstruction : DrawListInstruction {
 		uint32_t x_groups = 0;
 		uint32_t y_groups = 0;

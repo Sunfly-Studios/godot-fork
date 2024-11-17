@@ -63,9 +63,9 @@ template <typename T>
 class SafeNumeric {
 	std::atomic<T> value;
 
-    #if !defined(ATOMIC_ASSERT)
-    static_assert(std::atomic<T>::is_always_lock_free);
-    #endif
+#if !defined(ATOMIC_ASSERT)
+	static_assert(std::atomic<T>::is_always_lock_free);
+#endif
 
 public:
 	_ALWAYS_INLINE_ void set(T p_value) {
@@ -156,9 +156,9 @@ public:
 class SafeFlag {
 	std::atomic_bool flag;
 
-    #if !defined(ATOMIC_ASSERT)
+#if !defined(ATOMIC_ASSERT)
 	static_assert(std::atomic_bool::is_always_lock_free);
-    #endif
+#endif
 
 public:
 	_ALWAYS_INLINE_ bool is_set() const {

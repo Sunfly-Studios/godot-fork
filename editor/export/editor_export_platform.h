@@ -133,16 +133,16 @@ private:
 	void _export_find_dependencies(const String &p_path, HashSet<String> &p_paths);
 
 	static bool _check_hash(const uint8_t *p_hash, const Vector<uint8_t> &p_data);
-    
-    static Error _save_pack_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
-    static Error _save_pack_patch_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
+
+	static Error _save_pack_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
+	static Error _save_pack_patch_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
 
 	static Error _pack_add_shared_object(void *p_userdata, const SharedObject &p_so);
 
 	static Error _remove_pack_file(void *p_userdata, const String &p_path);
 
-    static Error _save_zip_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
-    static Error _save_zip_patch_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
+	static Error _save_zip_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
+	static Error _save_zip_patch_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
 
 	static Error _zip_add_shared_object(void *p_userdata, const SharedObject &p_so);
 
@@ -154,8 +154,8 @@ private:
 	static Error _script_save_file(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
 
 	static Error _script_add_shared_object(void *p_userdata, const SharedObject &p_so);
-    static Error _script_save_file_adapter(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
-    
+	static Error _script_save_file_adapter(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed);
+
 	void _edit_files_with_filter(Ref<DirAccess> &da, const Vector<String> &p_filters, HashSet<String> &r_list, bool exclude);
 	void _edit_filter_list(HashSet<String> &r_list, const String &p_filter, bool exclude);
 

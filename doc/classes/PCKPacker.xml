@@ -37,6 +37,9 @@
 		<method name="add_file_removal">
 			<return type="int" enum="Error" />
 			<param index="0" name="target_path" type="String" />
+			<param index="1" name="source_path" type="String" />
+			<param index="2" name="encrypt" type="bool" default="false" />
+			<param index="3" name="require_verification" type="bool" default="false" />
 			<description>
 				Registers a file removal of the [param target_path] internal path to the PCK. This is mainly used for patches. If the file at this path has been loaded from a previous PCK, it will be removed. The [code]res://[/code] prefix for [param target_path] is optional and stripped internally.
 				Adds the [param source_path] file to the current PCK package at the [param pck_path] internal path (should start with [code]res://[/code]).

@@ -335,7 +335,7 @@ void register_server_types() {
 
 	writer_exrwav = memnew(MovieWriterEXRWAV);
 	MovieWriter::add_writer(writer_exrwav);
-    
+
 	OS::get_singleton()->benchmark_end_measure("Servers", "Register Extensions");
 }
 
@@ -347,7 +347,7 @@ void unregister_server_types() {
 	memdelete(writer_mjpeg);
 	memdelete(writer_pngwav);
 	memdelete(writer_exrwav);
-    
+
 	OS::get_singleton()->benchmark_end_measure("Servers", "Unregister Extensions");
 }
 

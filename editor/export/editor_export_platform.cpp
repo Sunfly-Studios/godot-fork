@@ -375,7 +375,7 @@ Error EditorExportPlatform::_save_zip_patch_file(void *p_userdata, const ExportF
 		return OK;
 	}
 
-    return _save_zip_file(p_userdata, p_info, p_data, p_seed);
+	return _save_zip_file(p_userdata, p_info, p_data, p_seed);
 }
 
 Ref<ImageTexture> EditorExportPlatform::get_option_icon(int p_index) const {
@@ -1047,23 +1047,23 @@ Error EditorExportPlatform::_script_add_shared_object(void *p_userdata, const Sh
 }
 
 Error EditorExportPlatform::_script_save_file_adapter(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed) {
-    ScriptCallbackData *data = static_cast<ScriptCallbackData*>(p_userdata);
-    Variant result = data->file_cb.call(p_info.path, p_data, p_info.file_index, p_info.total_files, p_info.enc_in_filters, p_info.enc_ex_filters, p_info.enc_key);
-    
-    // Check if the result is valid and can be converted to an int (Error)
-    if (result.get_type() == Variant::INT) {
-        return static_cast<Error>(static_cast<int>(result));
-    } else {
-        // Handle the case where the callback didn't return a valid Error
-        return ERR_INVALID_DATA;
-    }
+	ScriptCallbackData *data = static_cast<ScriptCallbackData *>(p_userdata);
+	Variant result = data->file_cb.call(p_info.path, p_data, p_info.file_index, p_info.total_files, p_info.enc_in_filters, p_info.enc_ex_filters, p_info.enc_key);
+
+	// Check if the result is valid and can be converted to an int (Error)
+	if (result.get_type() == Variant::INT) {
+		return static_cast<Error>(static_cast<int>(result));
+	} else {
+		// Handle the case where the callback didn't return a valid Error
+		return ERR_INVALID_DATA;
+	}
 }
 
 Error EditorExportPlatform::_export_project_files(const Ref<EditorExportPreset> &p_preset, bool p_debug, const Callable &p_save_func, const Callable &p_so_func) {
-    ScriptCallbackData data;
-    data.file_cb = p_save_func;
-    data.so_cb = p_so_func;
-    return export_project_files(p_preset, p_debug, &_script_save_file_adapter, nullptr, &data, _script_add_shared_object);
+	ScriptCallbackData data;
+	data.file_cb = p_save_func;
+	data.so_cb = p_so_func;
+	return export_project_files(p_preset, p_debug, &_script_save_file_adapter, nullptr, &data, _script_add_shared_object);
 }
 
 Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &p_preset, bool p_debug, EditorExportSaveFunction p_save_func, EditorExportRemoveFunction p_remove_func, void *p_udata, EditorExportSaveSharedObject p_so_func) {
@@ -1442,7 +1442,7 @@ Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &
 				file_info.file_index = idx;
 				file_info.total_files = total;
 				err = p_save_func(p_udata, file_info, sarr, seed);
-				
+
 				if (err != OK) {
 					return err;
 				}
