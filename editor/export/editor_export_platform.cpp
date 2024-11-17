@@ -221,7 +221,7 @@ Error EditorExportPlatform::_save_pack_file(void *p_userdata, const ExportFileDa
 
 	PackData *pd = (PackData *)p_userdata;
 
-	String simplified_path = p_path.simplify_path();
+	String simplified_path = p_info.path.simplify_path();
 
 	SavedData sd;
 	sd.path_utf8 = simplified_path.trim_prefix("res://").utf8();
@@ -241,7 +241,7 @@ Error EditorExportPlatform::_save_pack_file(void *p_userdata, const ExportFileDa
 			}
 
 			for (int i = 0; i < p_info.enc_ex_filters.size(); ++i) {
-				if (simplified_path.matchn(p_info.enc_ex_filters[i]) || simplified_path.trim_prefix("res://", "").matchn(p_info.enc_ex_filters[i])) {
+				if (simplified_path.matchn(p_info.enc_ex_filters[i]) || simplified_path.trim_prefix("res://").matchn(p_info.enc_ex_filters[i])) {
 					sd.encrypted = false;
 					break;
 				}
@@ -261,7 +261,7 @@ Error EditorExportPlatform::_save_pack_file(void *p_userdata, const ExportFileDa
 			}
 
 			for (int i = 0; i < p_info.sign_ex_filters.size(); ++i) {
-				if (p_info.path.matchn(p_info.sign_ex_filters[i]) || simplified_path.trim_prefix("res://", "").matchn(p_info.sign_ex_filters[i])) {
+				if (p_info.path.matchn(p_info.sign_ex_filters[i]) || simplified_path.trim_prefix("res://").matchn(p_info.sign_ex_filters[i])) {
 					sd.require_verification = false;
 					break;
 				}
@@ -375,7 +375,7 @@ Error EditorExportPlatform::_save_zip_patch_file(void *p_userdata, const ExportF
 		return OK;
 	}
 
-    return _save_zip_file(p_userdata, p_info, p_data);
+    return _save_zip_file(p_userdata, p_info, p_data, p_seed);
 }
 
 Ref<ImageTexture> EditorExportPlatform::get_option_icon(int p_index) const {
@@ -1046,7 +1046,7 @@ Error EditorExportPlatform::_script_add_shared_object(void *p_userdata, const Sh
 	return (Error)ret.operator int();
 }
 
-Error EditorExportPlatform::_script_save_file_adapter(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data) {
+Error EditorExportPlatform::_script_save_file_adapter(void *p_userdata, const ExportFileData &p_info, const Vector<uint8_t> &p_data, uint64_t p_seed) {
     ScriptCallbackData *data = static_cast<ScriptCallbackData*>(p_userdata);
     Variant result = data->file_cb.call(p_info.path, p_data, p_info.file_index, p_info.total_files, p_info.enc_in_filters, p_info.enc_ex_filters, p_info.enc_key);
     
@@ -1063,7 +1063,7 @@ Error EditorExportPlatform::_export_project_files(const Ref<EditorExportPreset> 
     ScriptCallbackData data;
     data.file_cb = p_save_func;
     data.so_cb = p_so_func;
-    return export_project_files(p_preset, p_debug, &_script_save_file_adapter, &data, _script_add_shared_object);
+    return export_project_files(p_preset, p_debug, &_script_save_file_adapter, nullptr, &data, _script_add_shared_object);
 }
 
 Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &p_preset, bool p_debug, EditorExportSaveFunction p_save_func, EditorExportRemoveFunction p_remove_func, void *p_udata, EditorExportSaveSharedObject p_so_func) {
@@ -1441,7 +1441,7 @@ Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &
 				file_info.source_path = path;
 				file_info.file_index = idx;
 				file_info.total_files = total;
-				err = p_func(p_udata, file_info, sarr, seed);
+				err = p_save_func(p_udata, file_info, sarr, seed);
 				
 				if (err != OK) {
 					return err;
@@ -1654,7 +1654,7 @@ Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &
 	file_info.source_path = "res://" + config_file;
 	file_info.file_index = idx;
 	file_info.total_files = total;
-	err = p_func(p_udata, file_info, data, seed);
+	err = p_save_func(p_udata, file_info, data, seed);
 	if (err != OK) {
 		return err;
 	}

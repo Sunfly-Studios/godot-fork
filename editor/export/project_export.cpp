@@ -1815,6 +1815,7 @@ ProjectExportDialog::ProjectExportDialog() {
 	enc_scroll_container->set_name(TTR("Encryption"));
 	enc_scroll_container->set_horizontal_scroll_mode(ScrollContainer::SCROLL_MODE_DISABLED);
 
+	VBoxContainer *sec_vb = memnew(VBoxContainer);
 	VBoxContainer *enc_vb = memnew(VBoxContainer);
 	enc_vb->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 	enc_scroll_container->add_child(enc_vb);

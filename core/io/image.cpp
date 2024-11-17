@@ -98,7 +98,6 @@ SaveJPGBufferFunc Image::save_jpg_buffer_func = nullptr;
 SaveEXRBufferFunc Image::save_exr_buffer_func = nullptr;
 SaveQOIBufferFunc Image::save_qoi_buffer_func = nullptr;
 
-SaveWebPFunc Image::save_webp_func = nullptr;
 SaveWebPBufferFunc Image::save_webp_buffer_func = nullptr;
 
 // External loader function pointers.
@@ -109,6 +108,7 @@ ImageMemLoadFunc Image::_jpg_mem_loader_func = nullptr;
 ImageMemLoadFunc Image::_webp_mem_loader_func = nullptr;
 ImageMemLoadFunc Image::_tga_mem_loader_func = nullptr;
 ImageMemLoadFunc Image::_bmp_mem_loader_func = nullptr;
+ImageMemLoadFunc Image::_qoi_mem_loader_func = nullptr;
 ScalableImageMemLoadFunc Image::_svg_scalable_mem_loader_func = nullptr;
 ImageMemLoadFunc Image::_ktx_mem_loader_func = nullptr;
 
@@ -3190,39 +3190,6 @@ void Image::fill_rect(const Rect2i &p_rect, const Color &p_color) {
 	}
 }
 
-ImageMemLoadFunc Image::_png_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_png_mem_unpacker_func = nullptr;
-ImageMemLoadFunc Image::_jpg_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_webp_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_tga_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_bmp_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_qoi_mem_loader_func = nullptr;
-ScalableImageMemLoadFunc Image::_svg_scalable_mem_loader_func = nullptr;
-ImageMemLoadFunc Image::_ktx_mem_loader_func = nullptr;
-
-void (*Image::_image_compress_bc_func)(Image *, Image::UsedChannels) = nullptr;
-void (*Image::_image_compress_bptc_func)(Image *, Image::UsedChannels) = nullptr;
-void (*Image::_image_compress_etc1_func)(Image *) = nullptr;
-void (*Image::_image_compress_etc2_func)(Image *, Image::UsedChannels) = nullptr;
-void (*Image::_image_compress_astc_func)(Image *, Image::ASTCFormat) = nullptr;
-Error (*Image::_image_compress_bptc_rd_func)(Image *, Image::UsedChannels) = nullptr;
-Error (*Image::_image_compress_bc_rd_func)(Image *, Image::UsedChannels) = nullptr;
-void (*Image::_image_decompress_bc)(Image *) = nullptr;
-void (*Image::_image_decompress_bptc)(Image *) = nullptr;
-void (*Image::_image_decompress_etc1)(Image *) = nullptr;
-void (*Image::_image_decompress_etc2)(Image *) = nullptr;
-void (*Image::_image_decompress_astc)(Image *) = nullptr;
-
-Vector<uint8_t> (*Image::webp_lossy_packer)(const Ref<Image> &, float) = nullptr;
-Vector<uint8_t> (*Image::webp_lossless_packer)(const Ref<Image> &) = nullptr;
-Ref<Image> (*Image::webp_unpacker)(const Vector<uint8_t> &) = nullptr;
-Vector<uint8_t> (*Image::png_packer)(const Ref<Image> &) = nullptr;
-Ref<Image> (*Image::png_unpacker)(const Vector<uint8_t> &) = nullptr;
-Vector<uint8_t> (*Image::basis_universal_packer)(const Ref<Image> &, Image::UsedChannels) = nullptr;
-Ref<Image> (*Image::basis_universal_unpacker)(const Vector<uint8_t> &) = nullptr;
-Ref<Image> (*Image::basis_universal_unpacker_ptr)(const uint8_t *, int) = nullptr;
-
->>>>>>> bfa5e7d7c9 (QOI Image Support)
 void Image::_set_data(const Dictionary &p_data) {
 	ERR_FAIL_COND(!p_data.has("width"));
 	ERR_FAIL_COND(!p_data.has("height"));
