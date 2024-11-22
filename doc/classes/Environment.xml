@@ -438,6 +438,9 @@
 		<constant name="TONE_MAPPER_PBR_NEUTRAL" value="7" enum="ToneMapper">
 			Use the Khronos PBR Neutral tonemapper. PBR Neutral handles bright lighting in a more realistic fashion by desaturating it as it becomes brighter. PBR Neutral aims to look similar to [constant TONE_MAPPER_LINEAR] while reducing the clipping of bright highlights. Unlike [constant TONE_MAPPER_ACES], original colors are preserved as much as possible. The whitepoint value is ignored with this tonemapper, as PBR Neutral does not offer a whitepoint adjustment.
 		</constant>
+		<constant name="TONE_MAPPER_DRAGO" value="8" enum="ToneMapper">
+			Use Drago's adaptive logarithmic mapping tonemapper (2003). This operator provides good compression of high dynamic range images, preserving details in both dark and bright areas. It adaptively adjusts the logarithmic basis to improve local contrast. Drago's method is particularly effective for scenes with extreme luminance variations and can produce natural-looking results without the need for manual parameter tuning.
+		</constant>
 		<constant name="GLOW_BLEND_MODE_ADDITIVE" value="0" enum="GlowBlendMode">
 			Additive glow blending mode. Mostly used for particles, glows (bloom), lens flare, bright sources.
 		</constant>

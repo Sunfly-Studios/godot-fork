@@ -192,6 +192,24 @@ vec3 tonemap_pbr_neutral(vec3 color) {
 	return mix(color, vec3(1.0, 1.0, 1.0), g);
 }
 
+float luminance_drago(float L, float b) {
+	const float LMax = 1.0;
+	float Ld = b / (log(LMax + 1.0) / log(10.0));
+	Ld *= log(L + 1.0) / log(2.0 + 8.0 * pow((L / LMax), log(b) / log(0.5)));
+	return Ld;
+}
+
+// Based on the paper: "Adaptive Logarithmic Mapping For Displaying High Contrast Scenes"
+// https://resources.mpi-inf.mpg.de/tmo/logmap/logmap.pdf
+vec3 tonemap_drago(vec3 color, float white) {
+	const float BIAS = 0.85;
+	float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	float Ld = luminance_drago(luminance, BIAS);
+	color = color * (Ld / luminance);
+	color *= white;
+	return clamp(color, 0.0, 1.0);
+}
+
 #define TONEMAPPER_LINEAR 0
 #define TONEMAPPER_REINHARD 1
 #define TONEMAPPER_FILMIC 2
@@ -200,6 +218,7 @@ vec3 tonemap_pbr_neutral(vec3 color) {
 #define TONEMAPPER_AGX 5
 #define TONEMAPPER_AGX_PUNCHY 6
 #define TONEMAPPER_PBR_NEUTRAL 7
+#define TONEMAPPER_DRAGO 8
 
 vec3 apply_tonemapping(vec3 color, float p_white) { // inputs are LINEAR
 	// Ensure color values passed to tonemappers are positive.
@@ -218,6 +237,8 @@ vec3 apply_tonemapping(vec3 color, float p_white) { // inputs are LINEAR
 		return tonemap_agx(max(vec3(0.0f), color), true);
 	} else if (tonemapper == TONEMAPPER_PBR_NEUTRAL) {
 		return tonemap_pbr_neutral(max(vec3(0.0f), color));
+	} else if (tonemapper == TONEMAPPER_DRAGO) {
+		return tonemap_drago(max(vec3(0.0f), p_white));
 	} else if (tonemapper == TONEMAPPER_TONY_MC_MAPFACE) {
 #ifdef SKY_SHADER
 		// Sampling the Tony McMapface LUT in the sky shader leads to pitch black shadows if the "Sky" background
