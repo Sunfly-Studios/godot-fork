@@ -1120,7 +1120,8 @@ void Environment::_validate_property(PropertyInfo &p_property) const {
 		}
 	}
 
-	if (p_property.name == "tonemap_white" && (tone_mapper == TONE_MAPPER_LINEAR || tone_mapper == TONE_MAPPER_TONY_MC_MAPFACE)) {
+	if (p_property.name == "tonemap_white" && (tone_mapper == TONE_MAPPER_LINEAR || tone_mapper == TONE_MAPPER_AGX || tone_mapper == TONE_MAPPER_AGX_PUNCHY || tone_mapper == TONE_MAPPER_TONY_MC_MAPFACE)) {
+		// Whitepoint adjustment is not available for AgX or AgX Punchy as it's hardcoded there.
 		p_property.usage = PROPERTY_USAGE_NO_EDITOR;
 	}
 
@@ -1275,9 +1276,9 @@ void Environment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_tonemap_white"), &Environment::get_tonemap_white);
 
 #ifdef TONY_MC_MAPFACE_DISABLED
-	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES";
+	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,AgX,AgX Punchy";
 #else
-	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,Tony McMapface";
+	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,Tony McMapface,AgX,AgX Punchy";
 #endif
 
 	ADD_GROUP("Tonemap", "tonemap_");
@@ -1587,6 +1588,8 @@ void Environment::_bind_methods() {
 	BIND_ENUM_CONSTANT(TONE_MAPPER_FILMIC);
 	BIND_ENUM_CONSTANT(TONE_MAPPER_ACES);
 	BIND_ENUM_CONSTANT(TONE_MAPPER_TONY_MC_MAPFACE);
+	BIND_ENUM_CONSTANT(TONE_MAPPER_AGX);
+	BIND_ENUM_CONSTANT(TONE_MAPPER_AGX_PUNCHY);
 
 	BIND_ENUM_CONSTANT(GLOW_BLEND_MODE_ADDITIVE);
 	BIND_ENUM_CONSTANT(GLOW_BLEND_MODE_SCREEN);
