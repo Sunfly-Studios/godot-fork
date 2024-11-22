@@ -391,6 +391,18 @@ vec3 tonemap_drago(vec3 color, float white) {
 	return clamp(color, 0.0, 1.0);
 }
 
+// Optimised cineon tonemapping.
+// Adapted from Three.js (MIT)
+vec3 tonemap_cineon(vec3 color, float white) {
+	color *= white;
+	color = max(vec3(0.0), color - 0.004);
+	return pow(
+		(color * (6.2 * color + 0.5)) /
+		(color * (6.2 * color + 1.7) + 0.06),
+		vec3(2.2)
+	);
+}
+
 vec3 linear_to_srgb(vec3 color) {
 	//if going to srgb, clamp from 0 to 1.
 	color = clamp(color, vec3(0.0), vec3(1.0));
@@ -407,6 +419,7 @@ vec3 linear_to_srgb(vec3 color) {
 #define TONEMAPPER_AGX_PUNCHY 6
 #define TONEMAPPER_PBR_NEUTRAL 7
 #define TONEMAPPER_DRAGO 8
+#define TONEMAPPER_CINEON 9
 
 vec3 apply_tonemapping(vec3 color, float white) { // inputs are LINEAR
 	// Ensure color values passed to tonemappers are positive.
@@ -427,6 +440,8 @@ vec3 apply_tonemapping(vec3 color, float white) { // inputs are LINEAR
 		return tonemap_pbr_neutral(max(vec3(0.0f), color));
 	} else if (params.tonemapper == TONEMAPPER_DRAGO) {
 		return tonemap_drago(max(vec3(0.0f), color), white);
+	} else if (params.tonemapper == TONEMAPPER_CINEON) {
+		return tonemap_cineon(max(vec3(0.0f), color), white);
 	} else if (params.tonemapper == TONEMAPPER_TONY_MC_MAPFACE) {
 		return tonemap_tony_mc_mapface(max(vec3(0.0f), color));
 	} else {
