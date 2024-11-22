@@ -1203,6 +1203,7 @@ public:
 		ENV_TONE_MAPPER_TONY_MC_MAPFACE,
 		ENV_TONE_MAPPER_AGX,
 		ENV_TONE_MAPPER_AGX_PUNCHY,
+		ENV_TONE_MAPPER_PBR_NEUTRAL,
 	};
 
 	virtual void environment_set_tonemap(RID p_env, EnvironmentToneMapper p_tone_mapper, float p_exposure, float p_white) = 0;

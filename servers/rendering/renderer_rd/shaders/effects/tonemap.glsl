@@ -350,6 +350,28 @@ vec3 tonemap_tony_mc_mapface(vec3 stimulus) {
 	return texture(tony_mc_mapface_lut, uv).rgb;
 }
 
+// Adapted from https://modelviewer.dev/examples/tone-mapping#commerce
+vec3 tonemap_pbr_neutral(vec3 color) {
+	const float start_compression = 0.8 - 0.04;
+	const float desaturation = 0.15;
+
+	float x = min(color.r, min(color.g, color.b));
+	float offset = x < 0.08 ? x - 6.25 * x * x : 0.04;
+	color -= offset;
+
+	float peak = max(color.r, max(color.g, color.b));
+	if (peak < start_compression) {
+		return color;
+	}
+
+	float d = 1.0 - start_compression;
+	float new_peak = 1.0 - d * d / (peak + d - start_compression);
+	color *= new_peak / peak;
+
+	float g = 1.0 - 1.0 / (desaturation * (peak - new_peak) + 1.0);
+	return mix(color, vec3(1.0, 1.0, 1.0), g);
+}
+
 vec3 linear_to_srgb(vec3 color) {
 	//if going to srgb, clamp from 0 to 1.
 	color = clamp(color, vec3(0.0), vec3(1.0));
@@ -364,6 +386,7 @@ vec3 linear_to_srgb(vec3 color) {
 #define TONEMAPPER_TONY_MC_MAPFACE 4
 #define TONEMAPPER_AGX 4
 #define TONEMAPPER_AGX_PUNCHY 5
+#define TONEMAPPER_PBR_NEUTRAL 6
 
 vec3 apply_tonemapping(vec3 color, float white) { // inputs are LINEAR
 	// Ensure color values passed to tonemappers are positive.
@@ -380,6 +403,8 @@ vec3 apply_tonemapping(vec3 color, float white) { // inputs are LINEAR
 		return tonemap_agx(max(vec3(0.0f), color), false);
 	} else if (params.tonemapper == TONEMAPPER_AGX_PUNCHY) {
 		return tonemap_agx(max(vec3(0.0f), color), true);
+	} else if (params.tonemapper == TONEMAPPER_PBR_NEUTRAL) {
+		return tonemap_pbr_neutral(max(vec3(0.0f), color));
 	} else if (params.tonemapper == TONEMAPPER_TONY_MC_MAPFACE) {
 		return tonemap_tony_mc_mapface(max(vec3(0.0f), color));
 	} else {

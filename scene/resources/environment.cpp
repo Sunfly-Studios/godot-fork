@@ -1276,9 +1276,9 @@ void Environment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_tonemap_white"), &Environment::get_tonemap_white);
 
 #ifdef TONY_MC_MAPFACE_DISABLED
-	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,AgX,AgX Punchy";
+	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,AgX,AgX Punchy,PBR Neutral";
 #else
-	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,Tony McMapface,AgX,AgX Punchy";
+	const char *tonemap_modes = "Linear,Reinhard,Filmic,ACES,Tony McMapface,AgX,AgX Punchy,PBR Neutral";
 #endif
 
 	ADD_GROUP("Tonemap", "tonemap_");
@@ -1590,6 +1590,7 @@ void Environment::_bind_methods() {
 	BIND_ENUM_CONSTANT(TONE_MAPPER_TONY_MC_MAPFACE);
 	BIND_ENUM_CONSTANT(TONE_MAPPER_AGX);
 	BIND_ENUM_CONSTANT(TONE_MAPPER_AGX_PUNCHY);
+	BIND_ENUM_CONSTANT(TONE_MAPPER_PBR_NEUTRAL);
 
 	BIND_ENUM_CONSTANT(GLOW_BLEND_MODE_ADDITIVE);
 	BIND_ENUM_CONSTANT(GLOW_BLEND_MODE_SCREEN);
