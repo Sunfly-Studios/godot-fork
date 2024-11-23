@@ -251,7 +251,7 @@ vec3 apply_tonemapping(vec3 color, float p_white) { // inputs are LINEAR
 	} else if (tonemapper == TONEMAPPER_PBR_NEUTRAL) {
 		return tonemap_pbr_neutral(max(vec3(0.0f), color));
 	} else if (tonemapper == TONEMAPPER_DRAGO) {
-		return tonemap_drago(max(vec3(0.0f), p_white));
+		return tonemap_drago(max(vec3(0.0f), color), p_white);
 	} else if (tonemapper == TONEMAPPER_CINEON) {
 		return tonemap_cineon(max(vec3(0.0f), color), p_white);
 	} else if (tonemapper == TONEMAPPER_TONY_MC_MAPFACE) {
