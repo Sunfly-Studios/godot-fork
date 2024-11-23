@@ -532,6 +532,8 @@ if not env["deprecated"]:
 if env["precision"] == "double":
     env.Append(CPPDEFINES=["REAL_T_IS_DOUBLE"])
 
+
+
 tmppath = "./platform/" + env["platform"]
 sys.path.insert(0, tmppath)
 import detect

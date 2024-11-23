@@ -65,6 +65,10 @@
 #import <spirv_msl.hpp>
 #import <spirv_parser.hpp>
 
+#ifndef DISPATCH_FALLTHROUGH
+#define DISPATCH_FALLTHROUGH [[fallthrough]]
+#endif
+
 #pragma mark - Logging
 
 os_log_t LOG_DRIVER;
@@ -1038,6 +1042,7 @@ const uint32_t SHADER_BINARY_VERSION = 3;
 
 class BufWriter;
 
+#if defined(__clang__) && __has_cpp_attribute(clang::requires_compound_requires)
 template <typename T>
 concept Serializable = requires(T t, BufWriter &p_writer) {
 	{
@@ -1047,6 +1052,13 @@ concept Serializable = requires(T t, BufWriter &p_writer) {
 		t.serialize(p_writer)
 	} -> std::same_as<void>;
 };
+#else
+template <typename T>
+concept Serializable = requires(T t, BufWriter &p_writer) {
+    requires std::is_same_v<decltype(t.serialize_size()), size_t>;
+    requires std::is_same_v<decltype(t.serialize(p_writer)), void>;
+};
+#endif
 
 class BufWriter {
 	uint8_t *data = nullptr;
@@ -1156,6 +1168,7 @@ private:
 
 class BufReader;
 
+#if defined(__clang__) && __has_cpp_attribute(clang::requires_compound_requires)
 template <typename T>
 concept Deserializable = requires(T t, BufReader &p_reader) {
 	{
@@ -1165,6 +1178,13 @@ concept Deserializable = requires(T t, BufReader &p_reader) {
 		t.deserialize(p_reader)
 	} -> std::same_as<void>;
 };
+#else
+template <typename T>
+concept Deserializable = requires(T t, BufReader &p_reader) {
+    requires std::is_same_v<decltype(t.serialize_size()), size_t>;
+    requires std::is_same_v<decltype(t.deserialize(p_reader)), void>;
+};
+#endif
 
 class BufReader {
 	uint8_t const *data = nullptr;
@@ -3649,6 +3669,19 @@ void RenderingDeviceDriverMetal::command_timestamp_query_pool_reset(CommandBuffe
 
 void RenderingDeviceDriverMetal::command_timestamp_write(CommandBufferID p_cmd_buffer, QueryPoolID p_pool_id, uint32_t p_index) {
 }
+
+void RenderingDeviceDriverMetal::command_render_dispatch_mesh(CommandBufferID p_cmd_buffer, uint32_t p_x_groups, uint32_t p_y_groups, uint32_t p_z_groups) {
+    WARN_PRINT("command_render_dispatch_mesh not implemented for Metal");
+}
+
+void RenderingDeviceDriverMetal::command_render_dispatch_mesh_indirect(CommandBufferID p_cmd_buffer, BufferID p_indirect_buffer, uint64_t p_offset, uint32_t p_draw_count, uint32_t p_stride) {
+    WARN_PRINT("command_render_dispatch_mesh_indirect not implemented for Metal");
+}
+
+void RenderingDeviceDriverMetal::command_render_dispatch_mesh_indirect_count(CommandBufferID p_cmd_buffer, BufferID p_indirect_buffer, uint64_t p_offset, BufferID p_count_buffer, uint64_t p_count_buffer_offset, uint32_t p_max_draw_count, uint32_t p_stride) {
+    WARN_PRINT("command_render_dispatch_mesh_indirect_count not implemented for Metal");
+}
+
 
 #pragma mark - Labels
 

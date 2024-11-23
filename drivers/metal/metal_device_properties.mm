@@ -116,21 +116,31 @@ void MetalDeviceProperties::init_features(id<MTLDevice> p_device) {
 			setMSLVersion(3, 1);
 			break;
 #endif
+#ifdef MTLLanguageVersion3_0
 		case MTLLanguageVersion3_0:
 			setMSLVersion(3, 0);
 			break;
+#endif
+#ifdef MTLLanguageVersion2_4
 		case MTLLanguageVersion2_4:
 			setMSLVersion(2, 4);
 			break;
+#endif
+#ifdef MTLLanguageVersion2_3
 		case MTLLanguageVersion2_3:
 			setMSLVersion(2, 3);
 			break;
+#endif
+#ifdef MTLLanguageVersion2_2
 		case MTLLanguageVersion2_2:
 			setMSLVersion(2, 2);
 			break;
+#endif
+#ifdef MTLLanguageVersion2_1
 		case MTLLanguageVersion2_1:
 			setMSLVersion(2, 1);
 			break;
+#endif
 		case MTLLanguageVersion2_0:
 			setMSLVersion(2, 0);
 			break;

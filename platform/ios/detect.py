@@ -34,6 +34,7 @@ def get_opts():
         BoolVariable("ios_simulator", "Build for iOS Simulator", False),
         ("ios_triple", "Triple for ios toolchain", ""),
         BoolVariable("generate_bundle", "Generate an APP bundle after building iOS/macOS binaries", False),
+        BoolVariable("deprecated_ios_rotation", "Enables the deprecated iOS attemptRotationToDeviceOrientation", False),
     ]
 
 
@@ -140,6 +141,9 @@ def configure(env: "SConsEnvironment"):
 
     # Temp fix for ABS/MAX/MIN macros in iOS SDK blocking compilation
     env.Append(CCFLAGS=["-Wno-ambiguous-macro"])
+
+    if env["deprecated_ios_rotation"]:
+        env.Append(CPPDEFINES=["DEPRECATED_IOS_ROTATION"])
 
     env.Prepend(
         CPPPATH=[
