@@ -1659,7 +1659,19 @@ Error EditorExportPlatform::export_project_files(const Ref<EditorExportPreset> &
 	Dictionary int_export = get_internal_export_files();
 	for (const Variant &int_name : int_export.keys()) {
 		const PackedByteArray &array = int_export[int_name];
-		err = p_save_func(p_udata, int_name, array, idx, total, enc_in_filters, enc_ex_filters, key, seed);
+
+		// Create and populate ExportFileData struct
+		ExportFileData file_info;
+		file_info.path = String(int_name);
+		file_info.source_path = String(int_name);
+		file_info.file_index = idx;
+		file_info.total_files = total;
+		file_info.enc_in_filters = enc_in_filters;
+		file_info.enc_ex_filters = enc_ex_filters;
+		file_info.enc_key = key;
+		file_info.seed = seed;
+
+		err = p_save_func(p_udata, file_info, array);
 		if (err != OK) {
 			return err;
 		}

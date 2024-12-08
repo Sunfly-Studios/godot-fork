@@ -916,7 +916,7 @@ void ProjectExportDialog::_duplicate_preset() {
 	preset->set_enc_ex_filter(current->get_enc_ex_filter());
 	preset->set_enc_pck(current->get_enc_pck());
 	preset->set_enc_directory(current->get_enc_directory());
-	preset->set_script_encryption_key(current->get_script_encryption_key());
+	preset->set_pck_encryption_key(current->get_pck_encryption_key());
 	preset->set_script_export_mode(current->get_script_export_mode());
 
 	for (const KeyValue<StringName, Variant> &E : current->get_values()) {
