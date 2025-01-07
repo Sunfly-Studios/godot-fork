@@ -57,6 +57,8 @@
 #define XR_ARCH_ABI "ppc64"
 #elif defined(__powerpc__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define XR_ARCH_ABI "ppc64el"
+#elif defined(__powerpc__) && !defined(__powerpc64__)
+#define XR_ARCH_ABI "ppc32"
 #elif defined(__s390x__) || defined(__zarch__)
 #define XR_ARCH_ABI "s390x"
 #elif defined(__hppa__)
