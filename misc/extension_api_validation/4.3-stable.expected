@@ -200,6 +200,14 @@ Validate extension JSON: JSON file: Field was added in a way that breaks compati
 Added return values. Compatibility method registered.
 
 
+GH-87696
+--------
+Validate extension JSON: Error: Field 'classes/PCKPacker/methods/add_file/arguments': size changed value in new API, from 3 to 4.
+Validate extension JSON: Error: Field 'classes/ProjectSettings/methods/load_resource_pack/arguments': size changed value in new API, from 3 to 4.
+
+Added optional arguments. Compatibility methods registered.
+
+
 GH-99481
 --------
 Validate extension JSON: Error: Field 'classes/RichTextLabel/methods/push_meta/arguments': size changed value in new API, from 2 to 3.
